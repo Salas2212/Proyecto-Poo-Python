@@ -64,6 +64,7 @@ class Aeronave:
         self.numeroDeVuelosAsignados -= 1
         self.vuelos_desde_cali -= 1
         self.asignacion = "Disponible"
+        self.estado = "En espera"
 
 
 class Avion(Aeronave):

@@ -14,24 +14,8 @@ import time
 import io
 import sys
 
-'''
-def updFormSlot(position, array):
-    print(position, " in ", True)
-    st.session_state.formState[position] = True
-    st.session_state.ansForm[position] = array
-    print('guardado', st.session_state.ansForm[position])
-
-def askFormSlot(position):
-    return st.session_state.formState[position]
-'''
-
-
-
-
-
-
-
 class SistemaPrincipal:
+    
     def __init__(self, numero_de_puertas_de_embarque: int):
         self.torre_principal = TorreDeControl(numero_de_puertas_de_embarque)
         self.vuelos = self.torre_principal.vuelos
@@ -85,42 +69,6 @@ class SistemaPrincipal:
             return ret
         else:
             return "Indice de aeronave fuera de rango."
-
-    '''
-    def seleccion_menu(self):
-        print("\nSeleccione la acción que desea realizar:")
-        print("1. Comprar un vuelo.")
-        print("2. Consultar puertas de embarque.")
-        print("3. Consultar vuelos.")
-        print("4. Ver opciones de administrador")
-        print("0. Salir")
-        ans = int(input())
-        
-        if ans == 0:
-            return 0
-        elif ans == 4:
-            if not self.admin():
-                return -1
-            print("\n\nSeleccione la acción que desea realizar:")
-            print("5. Agregar una nave.")
-            print("6. Consultar información de las naves.")
-            print("7. Editar la información de una nave.")
-            print("8. Generar un vuelo.")
-            print("9. Ingresar una tripulación al sistema.")
-            print("10. Consultar tripulaciones")
-            print("11. Consultar historial de una puerta de embarque")
-            print("12. Finalizar un vuelo") # ! cambio importante.
-            print("13. Realizar mantenimiento Aeronave")
-            print("14. Ver coordenadas Aeronaves.")
-            print("0. Atrás")
-            ans = int(input())
-            if ans < 5 or ans > 14:
-                return -1
-            return ans
-        elif ans > 4 or ans < 1:
-            return -1
-        return ans
-    '''
 
 
     def comprar_un_vuelo(self):
@@ -221,10 +169,8 @@ class SistemaPrincipal:
         if temp == False:
             return False
         ans = temp
-        #print('ans: ', ans)
         if ans == "Si":
             avion = Avion()
-            #print ('se creo un avion!')
             self.torre_principal.agregar_aeronave(avion)
             return 'Avion creado exitosamente.'
         textos = []
@@ -233,13 +179,10 @@ class SistemaPrincipal:
         textos.append("Ingrese la velocidad máxima: ")
         textos.append("Ingrese la autonomía: ")
         textos.append("Ingrese el año de fabricación: ")
-        registro, capacidad, vel_max, aut, y_fabric = [0, 0, 0, 0, 0]
-        #print('pidiendo data')
         temp = formulario(textos, 1)
         if temp == False:
-            return temp
+            return False
         
-        #print("!", temp)
         registro, capacidad, vel_max, aut, y_fabric = temp
         
         state = "Disponible"
@@ -248,7 +191,6 @@ class SistemaPrincipal:
         if not respuesta:
             return False
         info = []
-        #print('c', respuesta)
         if respuesta == "Avion":
             info.append("Ingrese la altitud máxima: ")
             info.append("Ingrese la cantidad de motores: ")
@@ -260,7 +202,8 @@ class SistemaPrincipal:
             altitud_maxima, cantidad_motores, categoria = temp
             avion = Avion(registro, capacidad, vel_max, aut, y_fabric, state, altitud_maxima, cantidad_motores, categoria)
             self.torre_principal.agregar_aeronave(avion)
-            return "Avion creado correctamente."
+            
+            
         elif respuesta == "Helicoptero":
             info.append("Ingrese la cantidad de rotores: ")
             info.append("Ingrese la capacidad de elevación: ")
@@ -310,7 +253,6 @@ class SistemaPrincipal:
             info = []
             info.append(f"Digite el numero de la aeronave que desea editar ( 1 - {len(self.aeronaves)} ): ")
             idx = formulario(info, 0)
-            #print('idx got ', idx)
             if idx == False:
                 return False
             idx = int(idx)
@@ -319,7 +261,6 @@ class SistemaPrincipal:
             
         if 0 <= i < len(self.aeronaves):
             options = []
-            #print('mostrando opciones')
             options.append("1. Registro de marca")
             options.append("2. Capacidad de pasajeros")
             options.append("3. Velocidad máxima")
@@ -361,7 +302,6 @@ class SistemaPrincipal:
         
         
         nuevo_vuelo = Vuelo()
-        #print("Digite la ciudad de origen")
         nuevo_vuelo.ciudad_origen = formulario(["Digite la ciudad de origen"], 0)
         if nuevo_vuelo.ciudad_origen == False:
             return False
@@ -369,7 +309,6 @@ class SistemaPrincipal:
         es_de_cali = nuevo_vuelo.ciudad_origen == 'Cali'
 
         disp_aeronaves, aeronave_disponible = self.torre_principal.hay_aeronaves_disponibles(es_de_cali)
-        #disp_puertas, puerta_disponible = self.torre_principal.hay_puertas_disponibles()
 
         if not disp_aeronaves or not self.tripulacion:
             ret = "ERROR:\n"
@@ -378,10 +317,8 @@ class SistemaPrincipal:
             if not self.tripulacion:
                 ret += "No hay tripulaciones registradas en el sistema.\n"
             return ret
-        ##############################################
-        st.title("Información del País")
-
-        nombre_pais = st.text_input("Ingrese el nombre del país:")
+        
+        
         
         
         nuevo_vuelo.ciudad_destino = formulario(["Digite la ciudad de destino"], 1)
@@ -457,7 +394,6 @@ class SistemaPrincipal:
         return "Tripulación guardada exitosamente"
 
     def crear_pasajero(self):
-        #print("Desea usar datos guardados en las cookies? (S/N)")
         ans = seleccionMultiple(["Si", "No"], 0, "Desea usar datos guardados en las cookies?")
         if ans == False:
             return False
@@ -565,25 +501,29 @@ class SistemaPrincipal:
             return self.torre_principal.puertas_embarques[idx].imprimir_historial()
 
     def finalizar_vuelo(self):
-        if len(self.vuelos) == 0 or (i.puerta_embarque != "En vuelo" for i in self.vuelos):
-            print("No hay ningun vuelo en el aire\n")
-            return
+        hayEnVuelo = False
+        for i in self.vuelos:
+            if i.puerta_embarque == "En vuelo":
+                hayEnVuelo = True
+        if len(self.vuelos) == 0 or not hayEnVuelo:
+            return "No hay ningun vuelo en el aire\n"
         
-        #print(f"Existen {len(self.vuelos)} vuelos disponibles:")
         for i, vuelo in enumerate(self.vuelos):
             if not vuelo.puerta_embarque == "En vuelo":
                 continue
-            #print(f"{i}. {vuelo.numero_de_identificacion} | {vuelo.ciudad_origen}-{vuelo.ciudad_destino}")
-        ans = -1
-        while ans < 0 or ans >= len(self.vuelos) or self.vuelos[ans].puerta_embarque != "En vuelo":
-            #print("Digite el número del vuelo a despachar:")
-            ans = int(input())
-            if ans < 0 or ans >= len(self.vuelos) or self.vuelos[ans].puerta_embarque != "En vuelo":
-                #print("Opción no válida.\n\n")
-                continue
+            st.text(f"{i}. {vuelo.numero_de_identificacion} | {vuelo.ciudad_origen}-{vuelo.ciudad_destino}")
+            #print()
+        
+        ans = formulario(["Digite el numero del vuelo a despachar: "], 0)
+        if ans == False:
+            return False
+        ans = int(ans)
+        if ans < 0 or ans >= len(self.vuelos) or self.vuelos[ans].puerta_embarque != "En vuelo":
+            return "El numero digitado no es valido."
         
         self.aeronaves[self.vuelos[ans].id_aeronave].vaciar_aeronave()
         self.vuelos.pop(ans)
+        return "El vuelo ha sido reiniciado exitosamente."
 
 
     def admin(self):
@@ -595,7 +535,6 @@ class SistemaPrincipal:
         
         if respuesta >= 4:
             respuesta += 1
-        #print(respuesta , '!')
         if respuesta == 0:
             return
         if respuesta == 1:
